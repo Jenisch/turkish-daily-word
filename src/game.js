@@ -10,10 +10,12 @@ import {
   nextDateKey,
   puzzleDateKey,
 } from "./core.js";
-import { ANSWERS } from "./words.js";
+import { createDictionaryValidator } from "./dictionary.js";
+import { ALLOWED_WORDS, ANSWERS } from "./words.js";
 
 const puzzleKey = puzzleDateKey();
 const answer = answerForDate(puzzleKey, ANSWERS);
+const validateDictionaryWord = createDictionaryValidator(ALLOWED_WORDS);
 const validLetters = new Set(Array.from(TURKISH_LETTERS));
 
 const board = document.querySelector("#board");
@@ -56,6 +58,7 @@ let state = readJson(stateKey, defaultState);
 let stats = readJson(statsKey, defaultStats);
 let currentGuess = "";
 let messageTimer = null;
+let validatingGuess = false;
 
 puzzleDate.textContent = new Intl.DateTimeFormat("tr-TR", {
   timeZone: "Europe/Istanbul",
@@ -200,8 +203,8 @@ function finish(won) {
   window.setTimeout(() => statsDialog.showModal(), 450);
 }
 
-function submitGuess() {
-  if (state.finished) return;
+async function submitGuess() {
+  if (state.finished || validatingGuess) return;
   if (Array.from(currentGuess).length !== WORD_LENGTH) {
     showMessage("Beş harf gerekli.");
     return;
@@ -213,25 +216,38 @@ function submitGuess() {
     return;
   }
 
-  state.guesses.push(guess);
-  currentGuess = "";
-  saveState();
+  validatingGuess = true;
+  try {
+    const recognized = await validateDictionaryWord(guess);
+    if (!recognized) {
+      showMessage("Kelime sözlükte bulunamadı.");
+      return;
+    }
 
-  if (isWinningGuess(guess, answer)) {
-    finish(true);
-    return;
+    state.guesses.push(guess);
+    currentGuess = "";
+    saveState();
+
+    if (isWinningGuess(guess, answer)) {
+      finish(true);
+      return;
+    }
+
+    if (state.guesses.length >= MAX_GUESSES) {
+      finish(false);
+      return;
+    }
+
+    render();
+  } catch {
+    showMessage("Sözlük servisine ulaşılamadı. Tekrar dene.");
+  } finally {
+    validatingGuess = false;
   }
-
-  if (state.guesses.length >= MAX_GUESSES) {
-    finish(false);
-    return;
-  }
-
-  render();
 }
 
 function inputLetter(raw) {
-  if (state.finished || Array.from(currentGuess).length >= WORD_LENGTH) return;
+  if (state.finished || validatingGuess || Array.from(currentGuess).length >= WORD_LENGTH) return;
   const letter = normalizeTurkishWord(raw);
   if (Array.from(letter).length !== 1 || !validLetters.has(letter)) return;
   currentGuess += letter;
@@ -239,7 +255,7 @@ function inputLetter(raw) {
 }
 
 function backspace() {
-  if (state.finished || !currentGuess) return;
+  if (state.finished || validatingGuess || !currentGuess) return;
   const letters = Array.from(currentGuess);
   letters.pop();
   currentGuess = letters.join("");
@@ -247,7 +263,7 @@ function backspace() {
 }
 
 function handleKey(key) {
-  if (key === "ENTER") submitGuess();
+  if (key === "ENTER") void submitGuess();
   else if (key === "BACKSPACE") backspace();
   else inputLetter(key);
 }
