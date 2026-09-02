@@ -90,8 +90,6 @@ The tests verify:
 
 `.github/workflows/pages.yml` deploys the static repository to GitHub Pages whenever `main` changes. `.github/workflows/ci.yml` runs the test suite on pushes and pull requests.
 
-If Pages has not been enabled for the repository yet, open **Settings → Pages** once and select **GitHub Actions** as the source. Future deployments are automatic.
-
 ## Privacy
 
 The game has no analytics, accounts, cookies, remote API calls or server-side persistence. Game progress, theme choice and statistics remain in the browser's `localStorage`.
