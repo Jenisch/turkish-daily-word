@@ -2,6 +2,8 @@
 
 A lightweight Turkish daily word game with deterministic word rotation, Unicode-aware input handling, and a responsive browser interface.
 
+Created by **Kaan Atam**.
+
 [Live demo](https://jenisch.github.io/turkish-daily-word/) · [MIT License](./LICENSE)
 
 ## Why this project
@@ -108,4 +110,4 @@ The game has no analytics, accounts, cookies, or server-side persistence. Game p
 
 ## License
 
-MIT. See [LICENSE](./LICENSE).
+MIT. Copyright (c) 2026 Kaan Atam. See [LICENSE](./LICENSE).
