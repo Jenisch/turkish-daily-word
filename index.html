@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#111318" />
+    <meta
+      name="description"
+      content="Her gün aynı beş harfli Türkçe kelimeyi altı tahminde bulmaya çalışın."
+    />
+    <title>Turkish Daily Word</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-block">
+          <p class="eyebrow">GÜNLÜK TÜRKÇE KELİME</p>
+          <h1>Turkish Daily Word</h1>
+          <p id="puzzle-date" class="date-label"></p>
+        </div>
+        <div class="header-actions">
+          <button id="stats-button" class="icon-button" type="button" aria-label="İstatistikleri aç">▥</button>
+          <button id="theme-toggle" class="icon-button" type="button" aria-label="Temayı değiştir">☾</button>
+        </div>
+      </header>
+
+      <main>
+        <section class="game-card" aria-label="Kelime oyunu">
+          <div id="message" class="message" role="status" aria-live="polite"></div>
+          <div id="board" class="board" aria-label="Tahmin tahtası"></div>
+          <div id="keyboard" class="keyboard" aria-label="Türkçe klavye"></div>
+        </section>
+
+        <section class="rules" aria-labelledby="rules-title">
+          <div>
+            <p class="eyebrow">NASIL OYNANIR</p>
+            <h2 id="rules-title">Altı deneme. Beş harf.</h2>
+          </div>
+          <div class="rule-grid">
+            <p><span class="legend correct">A</span> Doğru harf, doğru konum.</p>
+            <p><span class="legend present">E</span> Kelimede var, konumu farklı.</p>
+            <p><span class="legend absent">K</span> Kelimede yok.</p>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <span>Deterministic daily puzzle · Europe/Istanbul</span>
+        <a href="https://github.com/Jenisch/turkish-daily-word">Source on GitHub</a>
+      </footer>
+    </div>
+
+    <dialog id="stats-dialog" class="stats-dialog">
+      <div class="dialog-header">
+        <div>
+          <p class="eyebrow">İSTATİSTİKLER</p>
+          <h2>Oyun geçmişin</h2>
+        </div>
+        <button id="stats-close" class="icon-button" type="button" aria-label="Kapat">×</button>
+      </div>
+      <div id="stats-grid" class="stats-grid"></div>
+      <h3>Tahmin dağılımı</h3>
+      <div id="distribution" class="distribution"></div>
+      <button id="share-button" class="primary-button" type="button" hidden>Sonucu paylaş</button>
+    </dialog>
+
+    <script type="module" src="./src/game.js"></script>
+  </body>
+</html>
