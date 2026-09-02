@@ -4,7 +4,7 @@ A lightweight Turkish daily word game with deterministic word rotation, Unicode-
 
 Created by **Kaan Atam**.
 
-[Live demo](https://jenisch.github.io/turkish-daily-word/) · [MIT License](./LICENSE)
+[Live demo](https://jenisch.github.io/turkish-daily-word/) · [Releases](https://github.com/Jenisch/turkish-daily-word/releases) · [MIT License](./LICENSE)
 
 ## Why this project
 
@@ -26,6 +26,7 @@ Word games become surprisingly subtle once Turkish casing, repeated-letter rules
 - Responsive and keyboard-accessible interface
 - Automated tests on Node.js 20 and 22
 - Automatic GitHub Pages deployment from `main`
+- Semantic Versioning and automated GitHub Releases
 
 ## Architecture
 
@@ -103,6 +104,16 @@ The tests verify:
 ## Deployment
 
 `.github/workflows/pages.yml` deploys the static repository to GitHub Pages whenever `main` changes. `.github/workflows/ci.yml` runs the test suite on pushes and pull requests.
+
+## Releases
+
+Stable milestones use [Semantic Versioning](https://semver.org/) with `vMAJOR.MINOR.PATCH` tags. `.github/workflows/release.yml` validates the version, runs the test suite, creates the tag, and publishes the GitHub Release.
+
+- `PATCH` for backwards-compatible fixes
+- `MINOR` for backwards-compatible features
+- `MAJOR` for breaking changes or a substantial incompatible redesign
+
+The first stable release is `v1.0.0`.
 
 ## Privacy
 
