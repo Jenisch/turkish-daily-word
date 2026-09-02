@@ -4,16 +4,16 @@ import {
   WORD_LENGTH,
   answerForDate,
   evaluateGuess,
+  isValidTurkishWord,
   isWinningGuess,
   normalizeTurkishWord,
   nextDateKey,
   puzzleDateKey,
 } from "./core.js";
-import { ALLOWED_WORDS, ANSWERS } from "./words.js";
+import { ANSWERS } from "./words.js";
 
 const puzzleKey = puzzleDateKey();
 const answer = answerForDate(puzzleKey, ANSWERS);
-const allowed = new Set(ALLOWED_WORDS.map(normalizeTurkishWord));
 const validLetters = new Set(Array.from(TURKISH_LETTERS));
 
 const board = document.querySelector("#board");
@@ -208,8 +208,8 @@ function submitGuess() {
   }
 
   const guess = normalizeTurkishWord(currentGuess);
-  if (!allowed.has(guess)) {
-    showMessage("Kelime listesinde yok.");
+  if (!isValidTurkishWord(guess)) {
+    showMessage("Yalnızca Türkçe harfler kullanılabilir.");
     return;
   }
 
