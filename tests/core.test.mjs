@@ -9,6 +9,7 @@ import {
   nextDateKey,
   normalizeTurkishWord,
 } from "../src/core.js";
+import { createDictionaryValidator, tdkResponseHasEntry } from "../src/dictionary.js";
 import { ALLOWED_WORDS, ANSWERS } from "../src/words.js";
 
 test("Turkish casing keeps dotted and dotless i semantics", () => {
@@ -84,4 +85,34 @@ test("guess evaluation is position-aware and duplicate-safe", () => {
     "correct",
     "correct",
   ]);
+});
+
+test("dictionary response parser distinguishes entries from not-found payloads", () => {
+  assert.equal(tdkResponseHasEntry([{ madde: "kağıt" }]), true);
+  assert.equal(tdkResponseHasEntry({ error: "Sonuç bulunamadı" }), false);
+  assert.equal(tdkResponseHasEntry([]), false);
+});
+
+test("dictionary validator keeps local guesses offline and checks missing words remotely", async () => {
+  const requests = [];
+  const fetchMock = async (url) => {
+    requests.push(url);
+    const isRealWord = url.includes("ka%C4%9F%C4%B1t");
+    return {
+      ok: true,
+      json: async () => (isRealWord ? [{ madde: "kağıt" }] : { error: "Sonuç bulunamadı" }),
+    };
+  };
+
+  const validate = createDictionaryValidator(ALLOWED_WORDS, fetchMock);
+
+  assert.equal(await validate("BALIK"), true);
+  assert.equal(requests.length, 0, "known local guesses should not make a network request");
+
+  assert.equal(await validate("KAĞIT"), true);
+  assert.equal(await validate("ŞYAOF"), false);
+  assert.equal(requests.length, 2);
+
+  assert.equal(await validate("KAĞIT"), true);
+  assert.equal(requests.length, 2, "remote results should be cached for the session");
 });

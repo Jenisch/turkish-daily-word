@@ -6,7 +6,7 @@ A lightweight Turkish daily word game with deterministic word rotation, Unicode-
 
 ## Why this project
 
-Word games become surprisingly subtle once Turkish casing and repeated-letter rules are involved. This project keeps those rules explicit and testable while staying deliberately small: no framework, no runtime dependencies, no backend, and no build step.
+Word games become surprisingly subtle once Turkish casing, repeated-letter rules, and guess validation are involved. This project keeps those rules explicit and testable while staying deliberately small: no framework, no backend, and no build step.
 
 ## Features
 
@@ -14,6 +14,8 @@ Word games become surprisingly subtle once Turkish casing and repeated-letter ru
 - Deterministic answer cycles with no repeat inside a complete cycle
 - Locale-aware Turkish casing for `i / ı / İ / I`
 - Five-letter validation against the Turkish alphabet
+- Dictionary-backed validation that rejects fabricated letter combinations
+- Fast local validation for the bundled guess pool with a TDK dictionary fallback for missing words
 - Duplicate-safe Wordle-style scoring
 - Six attempts with physical and on-screen Turkish keyboards
 - Persistent daily progress and local statistics via `localStorage`
@@ -28,13 +30,14 @@ Word games become surprisingly subtle once Turkish casing and repeated-letter ru
 ```text
 index.html
    └── src/game.js        browser state, rendering, keyboard, stats, sharing
-          ├── src/core.js pure deterministic game rules
-          └── src/words.js curated answer and accepted-guess pools
+          ├── src/core.js       pure deterministic game rules
+          ├── src/dictionary.js local-first dictionary validation
+          └── src/words.js      curated answer and local guess pools
 
-tests/core.test.mjs       selector, Turkish casing and scoring contracts
+tests/core.test.mjs       selector, casing, scoring and dictionary contracts
 ```
 
-The game rules live in `src/core.js` and do not depend on the DOM. That keeps the date selector, normalization and scoring logic independently testable.
+The core game rules do not depend on the DOM. Date selection, normalization, scoring, and dictionary-response handling remain independently testable.
 
 ### Daily puzzle selection
 
@@ -56,6 +59,12 @@ Accepted letters are restricted to:
 ```text
 ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZ
 ```
+
+### Guess validation
+
+The bundled word pool handles common guesses immediately and without a network request. When a structurally valid five-letter guess is missing from that local pool, `src/dictionary.js` checks the public Güncel Türkçe Sözlük endpoint at `sozluk.gov.tr` and caches the result for the current browser session.
+
+This keeps the static bundle small while avoiding false rejections for ordinary Turkish words. A failed dictionary request never consumes an attempt and never causes an unknown string to be accepted.
 
 ## Run locally
 
@@ -85,6 +94,9 @@ The tests verify:
 - full-cycle uniqueness
 - deterministic reshuffling between cycles
 - duplicate-safe letter evaluation
+- local-first dictionary behavior
+- positive and negative remote dictionary responses
+- session caching of remote validation results
 
 ## Deployment
 
@@ -92,7 +104,7 @@ The tests verify:
 
 ## Privacy
 
-The game has no analytics, accounts, cookies, remote API calls or server-side persistence. Game progress, theme choice and statistics remain in the browser's `localStorage`.
+The game has no analytics, accounts, cookies, or server-side persistence. Game progress, theme choice, statistics, and dictionary-result cache remain in the browser. Guesses that are not already present in the bundled local pool are sent as dictionary lookup terms to `sozluk.gov.tr`; no account or game-state data is included in that request.
 
 ## License
 
